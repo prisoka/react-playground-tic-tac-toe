@@ -3,16 +3,30 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 // Component: square. Renders a single <button>
-class Square extends React.Component {
-  render() {
-    const { value } = this.props
+// class Square extends React.Component {
+//   render() {
+//     const { value } = this.props
+//
+//     return (
+//       <button className="square" onClick={() => this.props.onClick()}>
+//         {value}
+//       </button>
+//     );
+//   }
+// }
 
-    return (
-      <button className="square" onClick={() => this.props.onClick()}>
-        {value}
-      </button>
-    );
-  }
+/*
+React supports a simpler syntax called functional components for component
+types like Square that only consist of a render method. Rather than define a
+class extending React.Component, simply write a function that takes props and
+returns what should be rendered. Replace the whole Square class with this:
+*/
+function Square(props) {
+  return (
+    <button className="square" onClick={props.onClick}>
+      {props.value}
+    </button>
+  );
 }
 
 // Component: board. Renders 9 squares
@@ -28,13 +42,17 @@ class Board extends React.Component {
     };
   }
 
-  /*Add handleClick to the Board class.*/
+  /*
+  Add handleClick to the Board class.
+  We call .slice() to copy the squares array instead of mutating the existing
+  array: "immutability".
+  */
   handleClick(i) {
     const squares = this.state.squares.slice();
     squares[i] = 'X';
     this.setState({squares: squares});
   }
-  
+
   /*
   a. Modify renderSquare method to pass a value prop to Square.
   b. Pass down a function from Board to Square that gets called when the
