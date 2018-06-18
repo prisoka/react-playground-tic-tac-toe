@@ -47,16 +47,21 @@ class Board extends React.Component {
     };
   }
 
-  /*
-  Add handleClick to the Board class. We call .slice() to copy the squares
-  array instead of mutating the existing array: "immutability".
-
-  Each time we move we shall toggle xIsNext by flipping the boolean value and
-  saving the state. Now update Board’s handleClick function to flip the value
-  of xIsNext:
-  */
   handleClick(i) {
+    /* Add handleClick to the Board class. We call .slice() to copy the squares
+    array instead of mutating the existing array: "immutability".*/
     const squares = this.state.squares.slice();
+
+    /* You can now change handleClick in Board to return early and ignore the
+    click if someone has already won the game or if a square is already filled:
+    */
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+
+    /* Each time we move we shall toggle xIsNext by flipping the boolean value
+    and saving the state. Now update Board’s handleClick function to flip the
+    value of xIsNext:*/
     // squares[i] = 'X';
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
@@ -86,8 +91,16 @@ class Board extends React.Component {
     /* Now X and O take turns. Next, change the “status” text in Board’s render
     so that it also displays who is next:*/
     // const status = 'Next player: X';
-    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    // const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
+    /* Declaring a winner: replace the status declaration in Board’s render: */
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    }
 
     return (
       <div>
@@ -127,6 +140,27 @@ class Game extends React.Component {
       </div>
     );
   }
+}
+
+/* Declaring a winner: add this helper function to the end of the file: */
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
 }
 
 // ========================================
