@@ -39,18 +39,30 @@ class Board extends React.Component {
     super(props);
     this.state = {
       squares: Array(9).fill(null),
+      /*
+      Let’s default the first move to be by ‘X’: modify our starting state in
+      the Board constructor:
+      */
+      xIsNext: true,
     };
   }
 
   /*
-  Add handleClick to the Board class.
-  We call .slice() to copy the squares array instead of mutating the existing
-  array: "immutability".
+  Add handleClick to the Board class. We call .slice() to copy the squares
+  array instead of mutating the existing array: "immutability".
+
+  Each time we move we shall toggle xIsNext by flipping the boolean value and
+  saving the state. Now update Board’s handleClick function to flip the value
+  of xIsNext:
   */
   handleClick(i) {
     const squares = this.state.squares.slice();
-    squares[i] = 'X';
-    this.setState({squares: squares});
+    // squares[i] = 'X';
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    this.setState({
+      squares: squares,
+      xIsNext: !this.state.xIsNext,
+    });
   }
 
   /*
@@ -71,7 +83,11 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: X';
+    /* Now X and O take turns. Next, change the “status” text in Board’s render
+    so that it also displays who is next:*/
+    // const status = 'Next player: X';
+    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+
 
     return (
       <div>
