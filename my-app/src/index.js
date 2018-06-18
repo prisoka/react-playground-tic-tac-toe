@@ -4,18 +4,11 @@ import './index.css';
 
 // Component: square. Renders a single <button>
 class Square extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-    };
-  }
-
   render() {
-    const { value } = this.state
+    const { value } = this.props
 
     return (
-      <button className="square" onClick={() => this.setState({value: 'X'})}>
+      <button className="square" onClick={() => this.props.onClick()}>
         {value}
       </button>
     );
@@ -24,8 +17,39 @@ class Square extends React.Component {
 
 // Component: board. Renders 9 squares
 class Board extends React.Component {
+  /*
+  Add a constructor to the Board and set its initial state to contain an
+  array with 9 nulls, corresponding to the 9 squares.
+  */
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(null),
+    };
+  }
+
+  /*Add handleClick to the Board class.*/
+  handleClick(i) {
+    const squares = this.state.squares.slice();
+    squares[i] = 'X';
+    this.setState({squares: squares});
+  }
+  
+  /*
+  a. Modify renderSquare method to pass a value prop to Square.
+  b. Pass down a function from Board to Square that gets called when the
+  square is clicked
+  c. We split the returned element into multiple lines for readability, and
+  added parentheses around it so that JavaScript doesn’t insert a semicolon
+  after return and break our code.
+  */
   renderSquare(i) {
-    return <Square value={i} />;
+    return (
+      <Square
+          value={this.state.squares[i]}
+          onClick={() => this.handleClick(i)}
+      />
+    );
   }
 
   render() {
