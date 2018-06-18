@@ -35,22 +35,39 @@ class Board extends React.Component {
   Add a constructor to the Board and set its initial state to contain an
   array with 9 nulls, corresponding to the 9 squares.
   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(null),
-      /*
-      Let’s default the first move to be by ‘X’: modify our starting state in
-      the Board constructor:
-      */
-      xIsNext: true,
-    };
-  }
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     squares: Array(9).fill(null),
+  //     /*
+  //     Let’s default the first move to be by ‘X’: modify our starting state in
+  //     the Board constructor:
+  //     */
+  //     xIsNext: true,
+  //   };
+  // }
+
+  /* Storing a History:
+  Change Board so that it takes squares via props and has its own onClick prop
+  specified by Game, like the transformation we made for Square earlier.
+  Here is a list of steps you need to do:
+  1. Delete the constructor in Board.
+  2. Replace this.state.squares[i] with this.props.squares[i] in Board’s
+  renderSquare.
+  3. Replace this.handleClick(i) with this.props.onClick(i) in Board’s
+  renderSquare. */
 
   handleClick(i) {
     /* Add handleClick to the Board class. We call .slice() to copy the squares
     array instead of mutating the existing array: "immutability".*/
-    const squares = this.state.squares.slice();
+    // const squares = this.state.squares.slice();
+
+    /* Storing a History: Next, we need to move the handleClick method
+    implementation from Board to Game. You can cut it from the Board class, and
+    paste it into the Game class.*/
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
 
     /* You can now change handleClick in Board to return early and ignore the
     click if someone has already won the game or if a square is already filled:
@@ -65,7 +82,14 @@ class Board extends React.Component {
     // squares[i] = 'X';
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
-      squares: squares,
+      /* Storing a History: We also need to change it a little, since Game
+      state is structured differently. Game’s handleClick can push a new entry
+      onto the stack by concatenating the new history entry to make a new
+      history array.*/
+      // squares: squares,
+      history: history.concat([{
+        squares: squares,
+      }]),
       xIsNext: !this.state.xIsNext,
     });
   }
@@ -81,8 +105,10 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square
-          value={this.state.squares[i]}
-          onClick={() => this.handleClick(i)}
+          // value={this.state.squares[i]}
+          // onClick={() => this.handleClick(i)}
+          value={this.props.squares[i]}
+          onClick={() => this.props.onClick(i)}
       />
     );
   }
@@ -102,9 +128,13 @@ class Board extends React.Component {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
 
+    /* Storing a History:
+    Since Game is now rendering the status, we can delete
+    <div className="status">{status}</div> and the code calculating the status
+    from the Board’s render function: */
     return (
       <div>
-        <div className="status">{status}</div>
+        {/* <div className="status">{status}</div> */}
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -127,15 +157,45 @@ class Board extends React.Component {
 
 // Component: game. Renders a board with some placeholders
 class Game extends React.Component {
+
+  /* Storing a History: set up the initial state for Game by adding a
+  constructor: */
+  constructor(props) {
+    super(props);
+    this.state = {
+      history: [{
+        squares: Array(9).fill(null),
+      }],
+      xIsNext: true,
+    };
+  }
+
+  /* Storing a History:
+  Game’s render should look at the most recent history entry and can take over
+  calculating the game status:*/
   render() {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
+
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board
+            squares={current.squares}
+            onClick={(i) => this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
-          <ol>{/* TODO */}</ol>
+         <div>{status}</div>
+         <ol>{/* TODO */}</ol>
         </div>
       </div>
     );
